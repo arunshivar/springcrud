@@ -15,9 +15,7 @@ public class UserService {
 
     @Autowired
     UserRepository userRepository;
-
-    ObjectMapper objectMapper = new ObjectMapper();
-
+    
     public User saveUserFromFile(MultipartFile file) throws IOException {
 
 
