@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-public class UserExceptionController {
+public class ExceptionController {
 
     @ExceptionHandler(value = UserNotFoundException.class)
     public ResponseEntity<ExceptionResponse> resourceNotFound(UserNotFoundException ex) {
@@ -15,7 +15,13 @@ public class UserExceptionController {
         response.setErrorMessage(ex.getMessage());
         // return new ResponseEntity<>(ex.toString(), HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-
-
     }
+
+
+    @ExceptionHandler(value = StorageException.class)
+    public  ResponseEntity fileHandlingException(StorageException ex) {
+        return new ResponseEntity(ex.toString(), HttpStatus.BAD_REQUEST);
+    }
+
+
 }

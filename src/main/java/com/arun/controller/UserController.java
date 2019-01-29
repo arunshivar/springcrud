@@ -3,10 +3,14 @@ package com.arun.controller;
 import com.arun.dal.UserRepository;
 import com.arun.exception.UserNotFoundException;
 import com.arun.model.User;
+import com.arun.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -18,6 +22,8 @@ public class UserController {
 
     private UserRepository userRepository;
 
+    @Autowired
+    private UserService userService;
     public UserController(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -63,6 +69,11 @@ public class UserController {
         } else {
             return "User not found.";
         }
+    }
+
+    @RequestMapping(value = "/uploadUserDetails", method = RequestMethod.POST, consumes = {"multipart/form-data"})
+    public User addUserFromFile(@RequestParam("file") MultipartFile file) throws IOException {
+        return userService.saveUserFromFile(file);
     }
 
 }
