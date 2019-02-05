@@ -4,7 +4,6 @@ import com.arun.exception.StorageException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,9 +17,13 @@ public class FileUploadController {
     @Value("${file.upload.path}")
     String path;
 
+    @RequestMapping(value = "/")
+    public String hello() {
+        return "Hello World";
+    }
+
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = {"multipart/form-data"})
     public String uploadFile(@RequestParam("file") MultipartFile file) {
-        // System.out.println(file.getOriginalFilename());
 
         if(file.isEmpty()){
             throw new StorageException("File cannot be empty");

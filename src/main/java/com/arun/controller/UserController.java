@@ -4,12 +4,21 @@ import com.arun.dal.UserRepository;
 import com.arun.exception.UserNotFoundException;
 import com.arun.model.User;
 import com.arun.service.UserService;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -19,12 +28,14 @@ public class UserController {
 
     private final Logger LOG = LoggerFactory.getLogger(getClass());
 
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private UserService userService;
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserController() {
+        // this.userRepository = userRepository;
+
     }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -73,6 +84,35 @@ public class UserController {
     @RequestMapping(value = "/uploadUserDetails", method = RequestMethod.POST, consumes = {"multipart/form-data"})
     public User addUserFromFile(@RequestParam("file") MultipartFile file) throws IOException {
         return userService.saveUserFromFile(file);
+    }
+
+    @RequestMapping(value = "/downloadUserList", method = RequestMethod.GET)
+    public ResponseEntity downloadUserList(){
+        List<User> userList = userService.downloadUserList();
+        ObjectMapper mapper = new ObjectMapper();
+        try
+        {
+            // writes a file to given location
+            // mapper.writeValue(new File("E://testdir//user.json"), userList);
+            byte [] buffer = mapper.writeValueAsBytes(userList);
+            return ResponseEntity
+                    .ok()
+                    .contentLength(buffer.length)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "userList.json")
+                    .contentType(
+                            MediaType.parseMediaType("application/octet-stream"))
+                    .body(new InputStreamResource(new ByteArrayInputStream(buffer)));
+        }
+        catch (JsonGenerationException e) {
+            e.printStackTrace();
+        }
+        catch (JsonMappingException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
